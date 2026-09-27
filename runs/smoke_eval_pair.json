@@ -1,0 +1,81 @@
+{
+ "subset_per_query": [
+  {
+   "idx": 0,
+   "delivered": true,
+   "cs": {
+    "is_valid_information_in_current_city": true,
+    "is_valid_information_in_sandbox": false,
+    "is_reasonable_visiting_city": false,
+    "is_valid_restaurants": true,
+    "is_valid_transportation": true,
+    "is_valid_attractions": true,
+    "is_valid_accommodation": true,
+    "is_not_absent": false
+   },
+   "hc": {},
+   "error": null,
+   "macro_cs": false,
+   "macro_hc": false,
+   "final": false
+  },
+  {
+   "idx": 1,
+   "delivered": false,
+   "cs": {},
+   "hc": {},
+   "error": null,
+   "macro_cs": false,
+   "macro_hc": false,
+   "final": false
+  },
+  {
+   "idx": 2,
+   "delivered": false,
+   "cs": {},
+   "hc": {},
+   "error": null,
+   "macro_cs": false,
+   "macro_hc": false,
+   "final": false
+  },
+  {
+   "idx": 3,
+   "delivered": false,
+   "cs": {},
+   "hc": {},
+   "error": null,
+   "macro_cs": false,
+   "macro_hc": false,
+   "final": false
+  },
+  {
+   "idx": 4,
+   "delivered": false,
+   "cs": {},
+   "hc": {},
+   "error": null,
+   "macro_cs": false,
+   "macro_hc": false,
+   "final": false
+  },
+  {
+   "idx": 5,
+   "delivered": false,
+   "cs": {},
+   "hc": {},
+   "error": null,
+   "macro_cs": false,
+   "macro_hc": false,
+   "final": false
+  }
+ ],
+ "official": {
+  "Delivery Rate": "2.2222222222222223%",
+  "Commonsense Constraint Micro Pass Rate": "1.3888888888888888%",
+  "Commonsense Constraint Macro Pass Rate": "0.0%",
+  "Hard Constraint Micro Pass Rate": "0.0%",
+  "Hard Constraint Macro Pass Rate": "0.0%",
+  "Final Pass Rate": "0.0%"
+ }
+}

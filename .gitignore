@@ -1,0 +1,20 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+third_party/
+*.egg-info/
+.DS_Store
+.jdk/
+
+# ---- 运行产物：只入库轻量、可复现、有证据价值的 ----
+runs/cache/
+runs/cost_ledger.jsonl
+runs/logs/
+
+# 重产物不入库（图/轨迹/逐题目录，单题 graph.json 可达 9MB）：
+runs/inference/q*/
+runs/inference.round*.bak/
+runs/anchor/
+runs/anchor.*/
+runs/build/round_*/

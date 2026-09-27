@@ -1,0 +1,30 @@
+{
+ "n": 50,
+ "delivered_old": 46,
+ "delivered_new": 46,
+ "blocking_old": 22,
+ "blocking_new": 18,
+ "improved": 2,
+ "worse": 0,
+ "regressed_pass": [],
+ "by_code_old": {
+  "route.loop": 1,
+  "budget.over": 6,
+  "plan.empty": 4,
+  "constraint.house_rule": 3,
+  "constraint.room_type": 2,
+  "route.sequence": 1,
+  "completeness.meal": 3,
+  "completeness.attraction": 1,
+  "route.city_count": 1
+ },
+ "by_code_new": {
+  "route.loop": 1,
+  "budget.over": 7,
+  "plan.empty": 4,
+  "route.sequence": 1,
+  "completeness.meal": 3,
+  "completeness.attraction": 1,
+  "route.city_count": 1
+ }
+}

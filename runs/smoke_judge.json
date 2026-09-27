@@ -1,0 +1,82 @@
+[
+ {
+  "u": "function",
+  "a": "add",
+  "delta": {
+   "function": "search_accommodations",
+   "instruction": "Add search_accommodations(city, max_price_per_night=None, min_occupancy=None, max_min_nights=None). Query Accommodation entities where city == city, price <= max_price_per_night, 'maximum occupancy' >= min_occupancy (party size), and 'minimum nights' <= max_min_nights (length of stay). Return all Accommodation attributes (NAME, city, price, room type, minimum nights, maximum occupancy)."
+  },
+  "rho": "Query idx=0 delivered a flight-only plan: cs_failed=['is_valid_restaurants','is_valid_accommodation','is_not_absent'] because lodging could not be searched (FUNCTIONS catalog is empty for non-flight services); idx=1-5 delivered nothing (delivery=17%). Every multi-day plan (all 6 queries) requires lodging, so this single gap blocks the most failed queries.",
+  "name": null
+ },
+ {
+  "u": "function",
+  "a": "add",
+  "delta": {
+   "function": "search_restaurants",
+   "instruction": "Add search_restaurants(city, cuisine=None, max_avg_cost=None). Query Restaurant entities where City == city, optionally Cuisines contains cuisine (case-insensitive substring), and 'Average Cost' <= max_avg_cost. Return Name, City, Cuisines, Average Cost."
+  },
+  "rho": "idx=0 cs_failed includes is_valid_restaurants and is_not_absent — the plan contained no valid dining because no restaurant search existed; dining is a daily requirement for all 6 queries, and idx=1-5 non-delivery (delivery=17%) also traces to missing dining coverage.",
+  "name": null
+ },
+ {
+  "u": "function",
+  "a": "add",
+  "delta": {
+   "function": "search_attractions",
+   "instruction": "Add search_attractions(city). Query Attraction entities where City == city; return Name and City. Used to ground each day's itinerary and to justify which cities are visited."
+  },
+  "rho": "idx=0 CS_FAILED includes is_reasonable_visiting_city and is_not_absent — visited cities had no attraction evidence in the plan, since only search_flights was callable. Recurring pattern (city grounding) with zero coverage in the catalog; also contributes to idx=1-5 non-delivery.",
+  "name": null
+ },
+ {
+  "u": "function",
+  "a": "modify",
+  "delta": {
+   "function": "search_flights",
+   "instruction": "Extend search_flights(origin, destination=None, date=None, max_price=None): filter on DestCityName == destination, FlightDate == date, Price <= max_price; guarantee returned rows include Flight Number, FlightDate, OriginCityName, DestCityName, Price. It was invoked in idx=0 with only {\"origin\": \"Fort Lauderdale\"} (12 rows), leaving destination/date/price unconstrained."
+  },
+  "rho": "idx=0 called search_flights with origin only — no destination/date/price filters, so the itinerary's city sequence was ungrounded (is_reasonable_visiting_city failed) and idx=1-5 could not assemble dated multi-city plans (macro_cs=0%, delivery=17%).",
+  "name": "search_flights"
+ },
+ {
+  "u": "entity_type",
+  "a": "modify",
+  "delta": {
+   "name": "Accommodation",
+   "description": "A bookable lodging (e.g., hotel room / apartment) in a city with a nightly price, room type, minimum-nights rule, and maximum occupancy.",
+   "primary_key": [
+    "NAME",
+    "city"
+   ],
+   "attributes": [
+    {
+     "name": "NAME",
+     "dtype": "string"
+    },
+    {
+     "name": "city",
+     "dtype": "string"
+    },
+    {
+     "name": "price",
+     "dtype": "float"
+    },
+    {
+     "name": "room_type",
+     "dtype": "string"
+    },
+    {
+     "name": "minimum_nights",
+     "dtype": "int"
+    },
+    {
+     "name": "maximum_occupancy",
+     "dtype": "int"
+    }
+   ]
+  },
+  "rho": "Accommodation has an empty description and spaced attribute names ('room type', 'minimum nights', 'maximum occupancy') that resist field matching; the KG is empty (nodes=0) and micro_hc=0% shows occupancy/budget hard constraints were never applied through these fields, while idx=0 failed is_valid_accommodation. Minimal fix: add description and normalize the three names to room_type / minimum_nights / maximum_occupancy.",
+  "name": "Accommodation"
+ }
+]

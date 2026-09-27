@@ -1,0 +1,291 @@
+meta:
+  domain: travel-planning
+entity_types:
+  Flight:
+    description: A priced, dated intercity air-transport leg (one row of flights); a flight number repeats
+      across dates so the date disambiguates the departure.
+    primary_key:
+    - Flight Number
+    - FlightDate
+    attributes:
+    - name: Flight Number
+      dtype: string
+    - name: Price
+      dtype: float
+    - name: DepTime
+      dtype: string
+    - name: ArrTime
+      dtype: string
+    - name: ActualElapsedTime
+      dtype: int
+    - name: FlightDate
+      dtype: date
+    - name: OriginCityName
+      dtype: string
+    - name: DestCityName
+      dtype: string
+    - name: Distance
+      dtype: int
+  Accommodation:
+    description: A nightly-priced lodging listing in one city constrained by occupancy, minimum stay,
+      room type, and house rules (one row of accommodations).
+    primary_key:
+    - NAME
+    - city
+    attributes:
+    - name: NAME
+      dtype: string
+    - name: room type
+      dtype: string
+    - name: price
+      dtype: float
+    - name: minimum nights
+      dtype: int
+    - name: review rate number
+      dtype: float
+    - name: house_rules
+      dtype: string
+    - name: maximum occupancy
+      dtype: int
+    - name: city
+      dtype: string
+  Restaurant:
+    description: A dining venue in one city serving one or more cuisines at a per-person meal cost (one
+      row of restaurants).
+    primary_key:
+    - Name
+    - City
+    attributes:
+    - name: Name
+      dtype: string
+    - name: City
+      dtype: string
+    - name: Cuisines
+      dtype: string
+    - name: Average Cost
+      dtype: float
+    - name: Aggregate Rating
+      dtype: float
+  Attraction:
+    description: An unpriced point of interest with coordinates for intra-day ordering (one row of attractions);
+      Address breaks ties for duplicate names within a city.
+    primary_key:
+    - Name
+    - City
+    - Address
+    attributes:
+    - name: Name
+      dtype: string
+    - name: Latitude
+      dtype: float
+    - name: Longitude
+      dtype: float
+    - name: Address
+      dtype: string
+    - name: Phone
+      dtype: string
+    - name: Website
+      dtype: string
+    - name: City
+      dtype: string
+  GroundTransportLink:
+    description: Reified directed ground route City->City qualified by duration and distance (one row
+      of distances); the ordered pair does not imply the reverse link exists and carries no cost.
+    primary_key:
+    - origin
+    - destination
+    attributes:
+    - name: origin
+      dtype: string
+    - name: destination
+      dtype: string
+    - name: duration
+      dtype: string
+    - name: distance
+      dtype: string
+  City:
+    description: Value type for a city name unified across flights, accommodations, restaurants, attractions,
+      and distances.
+    primary_key:
+    - name
+    attributes:
+    - name: name
+      dtype: string
+  Cuisine:
+    description: Value type for one atomic cuisine label split from the multi-valued restaurants Cuisines
+      field.
+    primary_key:
+    - name
+    attributes:
+    - name: name
+      dtype: string
+  RoomType:
+    description: Value type for a lodging category label from accommodations room type (entire/private/shared).
+    primary_key:
+    - name
+    attributes:
+    - name: name
+      dtype: string
+  HouseRule:
+    description: Value type for one atomic normalized policy clause split from accommodations house_rules
+      (pets/smoking/parties permissions).
+    primary_key:
+    - name
+    attributes:
+    - name: name
+      dtype: string
+  Date:
+    description: Value type for a calendar date literal taken from FlightDate values, enabling date-equality
+      joins for leg validity.
+    primary_key:
+    - name
+    attributes:
+    - name: name
+      dtype: date
+relation_types:
+  has_origin:
+    domain: Flight
+    range: City
+    functional: true
+    derive:
+      attr: OriginCityName
+    description: Departure city of a flight (hasOriginCity), derived by matching OriginCityName against
+      City.name.
+  has_destination:
+    domain: Flight
+    range: City
+    functional: true
+    derive:
+      attr: DestCityName
+    description: Arrival city of a flight (hasDestinationCity), derived by matching DestCityName against
+      City.name.
+  operates_on:
+    domain: Flight
+    range: Date
+    functional: true
+    derive:
+      attr: FlightDate
+    description: Calendar date on which a specific departure operates, derived by matching FlightDate
+      against Date.name.
+  located_in:
+    domain:
+    - Accommodation
+    - Restaurant
+    - Attraction
+    range: City
+    functional: true
+    derive:
+      attr_by_domain:
+        Accommodation: city
+        Restaurant: City
+        Attraction: City
+    description: City in which the accommodation, restaurant, or attraction is located (locatedInCity),
+      derived from each type's city attribute.
+  serves_cuisine:
+    domain: Restaurant
+    range: Cuisine
+    derive:
+      attr: Cuisines
+      split: ','
+      trim: true
+    description: Atomic cuisines served by a restaurant; each comma-separated token of Cuisines links
+      to its own Cuisine node (multi-valued, NOT functional).
+  has_room_type:
+    domain: Accommodation
+    range: RoomType
+    functional: true
+    derive:
+      attr: room type
+    description: Booking category of an accommodation (hasRoomType), derived from room type.
+  allows_policy:
+    domain: Accommodation
+    range: HouseRule
+    derive:
+      attr: house_rules
+      split: '&'
+      trim: true
+      normalize: lowercase_underscore
+    description: Atomic normalized house-rule policies stated for an accommodation; each ampersand-separated
+      clause of house_rules becomes its own HouseRule node (multi-valued, NOT functional).
+  from_city:
+    domain: GroundTransportLink
+    range: City
+    functional: true
+    derive:
+      attr: origin
+    description: Starting city of a directed ground route, derived from origin.
+  to_city:
+    domain: GroundTransportLink
+    range: City
+    functional: true
+    derive:
+      attr: destination
+    description: Ending city of a directed ground route, derived from destination.
+axioms:
+- kind: disjoint
+  classes:
+  - Flight
+  - Accommodation
+  - Restaurant
+  - Attraction
+  - GroundTransportLink
+- kind: disjoint
+  classes:
+  - City
+  - Cuisine
+  - RoomType
+  - HouseRule
+  - Date
+- kind: cardinality
+  relation: has_origin
+  class: Flight
+  min: 1
+  max: 1
+- kind: cardinality
+  relation: has_destination
+  class: Flight
+  min: 1
+  max: 1
+- kind: cardinality
+  relation: operates_on
+  class: Flight
+  min: 1
+  max: 1
+- kind: cardinality
+  relation: located_in
+  class: Accommodation
+  min: 1
+  max: 1
+- kind: cardinality
+  relation: located_in
+  class: Restaurant
+  min: 1
+  max: 1
+- kind: cardinality
+  relation: located_in
+  class: Attraction
+  min: 1
+  max: 1
+- kind: cardinality
+  relation: has_room_type
+  class: Accommodation
+  min: 1
+  max: 1
+- kind: cardinality
+  relation: from_city
+  class: GroundTransportLink
+  min: 1
+  max: 1
+- kind: cardinality
+  relation: to_city
+  class: GroundTransportLink
+  min: 1
+  max: 1
+- kind: cardinality
+  relation: serves_cuisine
+  class: Restaurant
+  min: 1
+- kind: cardinality
+  relation: allows_policy
+  class: Accommodation
+  min: 0
