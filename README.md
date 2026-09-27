@@ -1,8 +1,42 @@
+---
+license: apache-2.0
+language:
+- en
+tags:
+- travelplanner
+- llm-agent
+- ontology
+- reproduction
+task_categories:
+- text-generation
+- question-answering
+pretty_name: OaK × TravelPlanner Reproduction
+---
+
 # OaK 复现（TravelPlanner）
 
 复现 *Toward Effective and Reliable LLM Agents via Dynamic Ontology*（arXiv:2608.22974，无官方代码）在 TravelPlanner 上的效果。论文翻译与精读笔记见 notebook 仓库 `货拉拉记忆系统/论文/oak-dynamic-ontology/`。
 
 **怎么复现的（从零到成绩的每一步）→ `REPRODUCTION.md`；优化全程留痕 → `OPTIMIZATION_LOG.md`。**
+
+## 数据集内容（HF Hub 上的完整运行产物）
+
+本仓库同时作为复现结果的**公开档案**发布。除源码外，包含：
+
+| 路径 | 内容 |
+|---|---|
+| `runs/final/` | 冻结内核 K=(S,F)：`schema.yaml` + 9 个编译好的领域函数 |
+| `runs/build/round_1~5/` | **5 轮 OaK 构建循环全轨迹**：每轮 schema 进程、知识图谱、函数目录、ReAct 轨迹、评分、评判器反馈、函数补丁重测 |
+| `runs/inference/` | 最终 50 题推理产物：每题图（`graph.json`）+ ReAct 全轨迹（`trajectory.json`）+ 抽取统计，以及 `scores.json` / `plans.validation.jsonl` |
+| `runs/inference.round1.bak/` | 第一轮快照（Final 8/50），供前后对比 |
+| `runs/anchor/` + `anchor.v1~v4.bak.*` | anchor 9 题快速闭环 + 四轮迭代过程 |
+| `runs/replay/v1~v8/` | 离线重放各版本（确定性终态层演进 + 第三轮官方评测器实测成绩） |
+| `runs/cache/llm/` | LLM 请求级磁盘缓存（断点续跑不重复计费） |
+| `runs/cost_ledger.jsonl` | 全部 12,945 次 LLM 调用台账（模型/角色/token） |
+| `runs/data/` | 落盘 queries + 固定抽样索引（`sample_indices.json`，seed=42） |
+
+> 不包含：`.env`（API 密钥）、`third_party/TravelPlanner`（OSU-NLP-Group 官方仓库 clone，见下"前置"）、
+> `.venv/`、`.jdk/`。复现时需自备这些。
 
 ## 当前结果（2026-09-27，第二轮优化后）
 
