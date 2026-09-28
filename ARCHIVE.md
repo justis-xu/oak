@@ -57,3 +57,11 @@ uv sync
 `runs/cache/llm/` 是请求级磁盘缓存（键=请求内容哈希）。把它放回 `runs/cache/llm/`
 后重跑构建/推理，命中缓存的调用**不产生 API 费用**——可复现全部轨迹但不再花钱。
 未命中的部分才需真实 key。
+
+## 注意：HF 仓库的 `.gitignore` 与项目 git 仓库不同
+
+HF 上传器会读取仓库里的 `.gitignore` 并跳过匹配的文件。项目 git 仓库的 `.gitignore`
+为控制体积排除了重产物（`runs/inference/q*/`、`runs/build/round_*/` 等），若原样放到
+HF 会把这些**本该归档**的文件挡掉。故 HF 仓库单独放了一份只排除 `.env`/`.venv`/`.jdk`/
+`third_party`/`__pycache__` 的 `.gitignore`。两处内容刻意不同，勿同步回去。
+
