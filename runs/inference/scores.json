@@ -1,18 +1,18 @@
 {
  "summary": {
   "n": 50,
-  "delivery": 0.92,
-  "delivered": "46/50",
-  "micro_cs": 0.91,
-  "cs_pass": "364/400",
-  "macro_cs": 0.84,
-  "macro_cs_pass": "42/50",
-  "micro_hc": 0.8261,
-  "hc_pass": "95/115",
-  "macro_hc": 0.74,
-  "macro_hc_pass": "37/50",
-  "final": 0.7,
-  "final_pass": "35/50"
+  "delivery": 0.94,
+  "delivered": "47/50",
+  "micro_cs": 0.9275,
+  "cs_pass": "371/400",
+  "macro_cs": 0.88,
+  "macro_cs_pass": "44/50",
+  "micro_hc": 0.9043,
+  "hc_pass": "104/115",
+  "macro_hc": 0.82,
+  "macro_hc_pass": "41/50",
+  "final": 0.78,
+  "final_pass": "39/50"
  },
  "per_query": [
   {
@@ -21,7 +21,7 @@
    "cs": {
     "is_valid_information_in_current_city": true,
     "is_valid_information_in_sandbox": true,
-    "is_reasonable_visiting_city": false,
+    "is_reasonable_visiting_city": true,
     "is_valid_restaurants": true,
     "is_valid_transportation": true,
     "is_valid_attractions": true,
@@ -29,21 +29,19 @@
     "is_not_absent": true
    },
    "hc": {
-    "valid_cost": true,
+    "valid_cost": false,
     "valid_room_rule": null,
     "valid_cuisine": null,
     "valid_room_type": null,
     "valid_transportation": null
    },
-   "cs_msg": {
-    "is_reasonable_visiting_city": "The trip should be a closed circle."
-   },
+   "cs_msg": {},
    "hc_msg": {},
    "error": null,
    "hard_not_run_reason": null,
    "hc_denominator": 1,
-   "macro_cs": false,
-   "macro_hc": true,
+   "macro_cs": true,
+   "macro_hc": false,
    "final": false
   },
   {
@@ -251,30 +249,15 @@
   },
   {
    "idx": 17,
-   "delivered": true,
-   "cs": {
-    "is_valid_information_in_current_city": true,
-    "is_valid_information_in_sandbox": true,
-    "is_reasonable_visiting_city": true,
-    "is_valid_restaurants": true,
-    "is_valid_transportation": true,
-    "is_valid_attractions": true,
-    "is_valid_accommodation": true,
-    "is_not_absent": true
-   },
-   "hc": {
-    "valid_cost": false,
-    "valid_room_rule": null,
-    "valid_cuisine": null,
-    "valid_room_type": null,
-    "valid_transportation": null
-   },
+   "delivered": false,
+   "cs": {},
+   "hc": {},
    "cs_msg": {},
    "hc_msg": {},
    "error": null,
-   "hard_not_run_reason": null,
+   "hard_not_run_reason": "empty",
    "hc_denominator": 1,
-   "macro_cs": true,
+   "macro_cs": false,
    "macro_hc": false,
    "final": false
   },
@@ -311,9 +294,9 @@
    "idx": 34,
    "delivered": true,
    "cs": {
-    "is_valid_information_in_current_city": true,
+    "is_valid_information_in_current_city": false,
     "is_valid_information_in_sandbox": true,
-    "is_reasonable_visiting_city": true,
+    "is_reasonable_visiting_city": false,
     "is_valid_restaurants": true,
     "is_valid_transportation": true,
     "is_valid_attractions": true,
@@ -327,14 +310,17 @@
     "valid_room_type": null,
     "valid_transportation": null
    },
-   "cs_msg": {},
+   "cs_msg": {
+    "is_valid_information_in_current_city": "The accommodation in day 3 is invalid city choice.",
+    "is_reasonable_visiting_city": "The city sequence is invalid."
+   },
    "hc_msg": {},
    "error": null,
    "hard_not_run_reason": null,
    "hc_denominator": 1,
-   "macro_cs": true,
+   "macro_cs": false,
    "macro_hc": true,
-   "final": true
+   "final": false
   },
   {
    "idx": 37,
@@ -379,7 +365,7 @@
     "is_not_absent": true
    },
    "hc": {
-    "valid_cost": false,
+    "valid_cost": true,
     "valid_room_rule": null,
     "valid_cuisine": null,
     "valid_room_type": null,
@@ -391,8 +377,8 @@
    "hard_not_run_reason": null,
    "hc_denominator": 1,
    "macro_cs": true,
-   "macro_hc": false,
-   "final": false
+   "macro_hc": true,
+   "final": true
   },
   {
    "idx": 43,
@@ -410,17 +396,32 @@
   },
   {
    "idx": 47,
-   "delivered": false,
-   "cs": {},
-   "hc": {},
+   "delivered": true,
+   "cs": {
+    "is_valid_information_in_current_city": true,
+    "is_valid_information_in_sandbox": true,
+    "is_reasonable_visiting_city": true,
+    "is_valid_restaurants": true,
+    "is_valid_transportation": true,
+    "is_valid_attractions": true,
+    "is_valid_accommodation": true,
+    "is_not_absent": true
+   },
+   "hc": {
+    "valid_cost": true,
+    "valid_room_rule": null,
+    "valid_cuisine": null,
+    "valid_room_type": null,
+    "valid_transportation": null
+   },
    "cs_msg": {},
    "hc_msg": {},
    "error": null,
-   "hard_not_run_reason": "empty",
+   "hard_not_run_reason": null,
    "hc_denominator": 1,
-   "macro_cs": false,
-   "macro_hc": false,
-   "final": false
+   "macro_cs": true,
+   "macro_hc": true,
+   "final": true
   },
   {
    "idx": 51,
@@ -453,15 +454,30 @@
   },
   {
    "idx": 56,
-   "delivered": false,
-   "cs": {},
-   "hc": {},
+   "delivered": true,
+   "cs": {
+    "is_valid_information_in_current_city": true,
+    "is_valid_information_in_sandbox": true,
+    "is_reasonable_visiting_city": true,
+    "is_valid_restaurants": true,
+    "is_valid_transportation": true,
+    "is_valid_attractions": true,
+    "is_valid_accommodation": true,
+    "is_not_absent": true
+   },
+   "hc": {
+    "valid_cost": false,
+    "valid_room_rule": null,
+    "valid_cuisine": null,
+    "valid_room_type": null,
+    "valid_transportation": null
+   },
    "cs_msg": {},
    "hc_msg": {},
    "error": null,
-   "hard_not_run_reason": "empty",
+   "hard_not_run_reason": null,
    "hc_denominator": 1,
-   "macro_cs": false,
+   "macro_cs": true,
    "macro_hc": false,
    "final": false
   },
@@ -612,32 +628,17 @@
   },
   {
    "idx": 74,
-   "delivered": true,
-   "cs": {
-    "is_valid_information_in_current_city": true,
-    "is_valid_information_in_sandbox": true,
-    "is_reasonable_visiting_city": true,
-    "is_valid_restaurants": true,
-    "is_valid_transportation": true,
-    "is_valid_attractions": true,
-    "is_valid_accommodation": true,
-    "is_not_absent": true
-   },
-   "hc": {
-    "valid_cost": true,
-    "valid_room_rule": true,
-    "valid_cuisine": null,
-    "valid_room_type": null,
-    "valid_transportation": null
-   },
+   "delivered": false,
+   "cs": {},
+   "hc": {},
    "cs_msg": {},
    "hc_msg": {},
    "error": null,
-   "hard_not_run_reason": null,
+   "hard_not_run_reason": "empty",
    "hc_denominator": 2,
-   "macro_cs": true,
-   "macro_hc": true,
-   "final": true
+   "macro_cs": false,
+   "macro_hc": false,
+   "final": false
   },
   {
    "idx": 78,
@@ -711,7 +712,7 @@
     "is_not_absent": true
    },
    "hc": {
-    "valid_cost": false,
+    "valid_cost": true,
     "valid_room_rule": true,
     "valid_cuisine": null,
     "valid_room_type": null,
@@ -723,8 +724,8 @@
    "hard_not_run_reason": null,
    "hc_denominator": 2,
    "macro_cs": true,
-   "macro_hc": false,
-   "final": false
+   "macro_hc": true,
+   "final": true
   },
   {
    "idx": 99,
@@ -740,7 +741,7 @@
     "is_not_absent": true
    },
    "hc": {
-    "valid_cost": true,
+    "valid_cost": false,
     "valid_room_rule": null,
     "valid_cuisine": null,
     "valid_room_type": true,
@@ -752,8 +753,8 @@
    "hard_not_run_reason": null,
    "hc_denominator": 2,
    "macro_cs": true,
-   "macro_hc": true,
-   "final": true
+   "macro_hc": false,
+   "final": false
   },
   {
    "idx": 100,
@@ -798,7 +799,7 @@
     "is_not_absent": true
    },
    "hc": {
-    "valid_cost": false,
+    "valid_cost": true,
     "valid_room_rule": true,
     "valid_cuisine": null,
     "valid_room_type": null,
@@ -810,8 +811,8 @@
    "hard_not_run_reason": null,
    "hc_denominator": 2,
    "macro_cs": true,
-   "macro_hc": false,
-   "final": false
+   "macro_hc": true,
+   "final": true
   },
   {
    "idx": 105,
@@ -915,31 +916,41 @@
    },
    "hc": {
     "valid_cost": true,
-    "valid_room_rule": false,
+    "valid_room_rule": true,
     "valid_cuisine": null,
     "valid_room_type": null,
     "valid_transportation": null
    },
    "cs_msg": {},
-   "hc_msg": {
-    "valid_room_rule": "The house rule should be parties."
-   },
+   "hc_msg": {},
    "error": null,
    "hard_not_run_reason": null,
    "hc_denominator": 2,
    "macro_cs": true,
-   "macro_hc": false,
-   "final": false
+   "macro_hc": true,
+   "final": true
   },
   {
    "idx": 116,
-   "delivered": false,
-   "cs": {},
+   "delivered": true,
+   "cs": {
+    "is_valid_information_in_current_city": true,
+    "is_valid_information_in_sandbox": false,
+    "is_reasonable_visiting_city": false,
+    "is_valid_restaurants": true,
+    "is_valid_transportation": true,
+    "is_valid_attractions": true,
+    "is_valid_accommodation": true,
+    "is_not_absent": true
+   },
    "hc": {},
-   "cs_msg": {},
+   "cs_msg": {
+    "is_valid_information_in_sandbox": "The self-driving in day 7 is invalid in the sandbox.",
+    "is_reasonable_visiting_city": "The trip should be a closed circle."
+   },
    "hc_msg": {},
    "error": null,
-   "hard_not_run_reason": "empty",
+   "hard_not_run_reason": "gated",
    "hc_denominator": 2,
    "macro_cs": false,
    "macro_hc": false,
@@ -988,16 +999,14 @@
     "is_not_absent": true
    },
    "hc": {
-    "valid_cost": true,
+    "valid_cost": false,
     "valid_room_rule": true,
     "valid_cuisine": null,
-    "valid_room_type": false,
+    "valid_room_type": true,
     "valid_transportation": true
    },
    "cs_msg": {},
-   "hc_msg": {
-    "valid_room_type": "The room type should be entire room."
-   },
+   "hc_msg": {},
    "error": null,
    "hard_not_run_reason": null,
    "hc_denominator": 4,
@@ -1106,7 +1115,7 @@
     "is_not_absent": true
    },
    "hc": {
-    "valid_cost": true,
+    "valid_cost": false,
     "valid_room_rule": true,
     "valid_cuisine": null,
     "valid_room_type": true,
@@ -1118,8 +1127,8 @@
    "hard_not_run_reason": null,
    "hc_denominator": 4,
    "macro_cs": true,
-   "macro_hc": true,
-   "final": true
+   "macro_hc": false,
+   "final": false
   },
   {
    "idx": 145,
@@ -1214,7 +1223,7 @@
    "cs": {
     "is_valid_information_in_current_city": true,
     "is_valid_information_in_sandbox": true,
-    "is_reasonable_visiting_city": false,
+    "is_reasonable_visiting_city": true,
     "is_valid_restaurants": true,
     "is_valid_transportation": true,
     "is_valid_attractions": true,
@@ -1228,16 +1237,14 @@
     "valid_room_type": true,
     "valid_transportation": true
    },
-   "cs_msg": {
-    "is_reasonable_visiting_city": "The city sequence is invalid."
-   },
+   "cs_msg": {},
    "hc_msg": {},
    "error": null,
    "hard_not_run_reason": null,
    "hc_denominator": 4,
-   "macro_cs": false,
+   "macro_cs": true,
    "macro_hc": true,
-   "final": false
+   "final": true
   },
   {
    "idx": 154,
@@ -1279,19 +1286,23 @@
     "is_valid_transportation": true,
     "is_valid_attractions": true,
     "is_valid_accommodation": true,
-    "is_not_absent": false
+    "is_not_absent": true
    },
-   "hc": {},
-   "cs_msg": {
-    "is_not_absent": "No attaction in day 5 is not allowed."
+   "hc": {
+    "valid_cost": true,
+    "valid_room_rule": true,
+    "valid_cuisine": null,
+    "valid_room_type": true,
+    "valid_transportation": true
    },
+   "cs_msg": {},
    "hc_msg": {},
    "error": null,
-   "hard_not_run_reason": "gated",
+   "hard_not_run_reason": null,
    "hc_denominator": 4,
-   "macro_cs": false,
-   "macro_hc": false,
-   "final": false
+   "macro_cs": true,
+   "macro_hc": true,
+   "final": true
   },
   {
    "idx": 157,
@@ -1307,7 +1318,7 @@
     "is_not_absent": true
    },
    "hc": {
-    "valid_cost": false,
+    "valid_cost": true,
     "valid_room_rule": true,
     "valid_cuisine": true,
     "valid_room_type": null,
@@ -1319,8 +1330,8 @@
    "hard_not_run_reason": null,
    "hc_denominator": 4,
    "macro_cs": true,
-   "macro_hc": false,
-   "final": false
+   "macro_hc": true,
+   "final": true
   },
   {
    "idx": 167,
@@ -1384,25 +1395,31 @@
    "idx": 179,
    "delivered": true,
    "cs": {
-    "is_valid_information_in_current_city": true,
+    "is_valid_information_in_current_city": false,
     "is_valid_information_in_sandbox": true,
     "is_reasonable_visiting_city": true,
     "is_valid_restaurants": true,
     "is_valid_transportation": true,
     "is_valid_attractions": true,
     "is_valid_accommodation": true,
-    "is_not_absent": false
+    "is_not_absent": true
    },
-   "hc": {},
+   "hc": {
+    "valid_cost": true,
+    "valid_room_rule": true,
+    "valid_cuisine": true,
+    "valid_room_type": true,
+    "valid_transportation": null
+   },
    "cs_msg": {
-    "is_not_absent": "Invalid City Number"
+    "is_valid_information_in_current_city": "The breakfast in day 6 is invalid city choice."
    },
    "hc_msg": {},
    "error": null,
-   "hard_not_run_reason": "gated",
+   "hard_not_run_reason": null,
    "hc_denominator": 4,
    "macro_cs": false,
-   "macro_hc": false,
+   "macro_hc": true,
    "final": false
   }
  ],

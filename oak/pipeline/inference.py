@@ -80,10 +80,14 @@ async def run_inference(cfg: Config | None = None, limit: int | None = None,
                 build_graph(entities + dist_entities, relations, schema),
                 schema),
             cfg.tp_root)
-        # 官方库补齐该题相关城市实体（图是语料子集，官方判据是全量库）
-        n_aug = augment_graph_with_official(g, q, cfg.tp_root)
-        if n_aug:
-            enrich_city_nodes(g, cfg.tp_root)      # 计数/covered 重算
+        # 【第五轮回滚】官方库补图（augment_graph_with_official）经 anchor 三轮验证为
+        # 净负改动：7/9 → 6/9 → 3/9。为救 q47/q116 两题把几百实体灌进图，改变了
+        # ReAct 全局行为分布（大候选池下 flash 不稳定），第二轮过的题反而丢 11 题。
+        # 函数保留在 kg/graph.py 供后续研究，此处停用。
+        # n_aug = augment_graph_with_official(g, q, cfg.tp_root)
+        # if n_aug:
+        #     derive_relations(g, schema)
+        #     enrich_city_nodes(g, cfg.tp_root)
         qdir = out_dir / f"q{q.idx}"
         save_graph(g, qdir / "graph.json")
         (qdir / "extraction_stats.json").write_text(json.dumps({

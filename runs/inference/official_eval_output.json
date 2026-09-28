@@ -1,8 +1,8 @@
 {
- "Delivery Rate": "25.555555555555554%",
- "Commonsense Constraint Micro Pass Rate": "25.27777777777778%",
- "Commonsense Constraint Macro Pass Rate": "23.333333333333332%",
- "Hard Constraint Micro Pass Rate": "22.61904761904762%",
- "Hard Constraint Macro Pass Rate": "20.555555555555554%",
- "Final Pass Rate": "19.444444444444446%"
+ "Delivery Rate": "26.111111111111114%",
+ "Commonsense Constraint Micro Pass Rate": "25.763888888888886%",
+ "Commonsense Constraint Macro Pass Rate": "24.444444444444443%",
+ "Hard Constraint Micro Pass Rate": "24.761904761904763%",
+ "Hard Constraint Macro Pass Rate": "22.77777777777778%",
+ "Final Pass Rate": "21.666666666666668%"
 }

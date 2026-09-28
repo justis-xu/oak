@@ -18,6 +18,13 @@ MODEL_ROLES: dict[str, str] = {
     "react": "fast",         # P5 ReAct 执行
     "slots": "fast",         # extract_runtime_slots 槽位提取
     "plan_repair": "fast",   # 计划格式修复 / salvage
+    # ---- locomo 子项目（中文 LoCoMo 本体问答）----
+    "locomo_schema": "strong",   # P1/P2 本体起草
+    "locomo_answer": "strong",   # 终答合成 + 证据自检
+    "locomo_judge": "strong",    # 严格判分
+    "locomo_extract": "fast",    # 原子事实抽取
+    "locomo_util": "fast",       # 实体归并 / 完整性审计 / 格式修复
+    "locomo_steps": "fast",      # ReAct 步骤
 }
 
 
@@ -42,8 +49,8 @@ class Config:
     test_size: int = 50
     seed: int = 42
 
-    # 各环节限额
-    react_max_steps: int = 20
+    # 各环节限额（第五轮：城市池变宽后 20 步不够逐城收集 → 26）
+    react_max_steps: int = 30
     schema_attempts: int = 4
     func_gen_attempts: int = 3
     plan_repair_attempts: int = 2

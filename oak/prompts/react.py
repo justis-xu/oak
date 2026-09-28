@@ -78,17 +78,17 @@ BUDGET (official formula, total must stay <= {budget})
   self-driving: int(km x 0.05) x ceil({people}/5); taxi: int(km) x ceil({people}/4).
 
 === WORKFLOW ===
-1. Establish the route first: {org} -> exactly {cities} visited cities -> {org}.
-   Each visited city is one consecutive block. For a state destination, use only
-   covered cities whose state exactly equals {dest}.
-2. Select functions by the catalog descriptions. Keep only exact successful
-   candidates; warnings, empty results, relaxed mismatches, and suggestions are
-   discovery information, not plan values. A relaxed flight row must be re-queried
-   with the exact origin, destination, and date before it can be selected.
-3. Gather transport for every moving day, then lodging, restaurants, and
-   attractions for each route city. On a moving day, meals and attractions may
-   use either endpoint; lodging must use the destination. On a stay day, all
-   entities must use that city.
+1. CHOOSE CITIES IMMEDIATELY from the covered-city list above — do NOT verify every
+   listed city. The list is sorted by cheapest lodging first; prefer the cheapest
+   cities that have enough data. Pick exactly {cities} cities. You have at most ~30
+   steps total: budget them. NEVER output an empty plan before you have actually
+   made function calls — "no evidence" is only valid AFTER real searches failed.
+2. Transport per leg first: for each leg of the loop (org->C1, C1->C2, ..., Cn->org)
+   search flights once; if a leg has no flight, try ground transport (Taxi /
+   Self-driving) for that leg — do not scan more cities.
+3. Then gather lodging, restaurants, attractions ONLY for the chosen cities
+   (one or two calls per city per category). Stop gathering once you have enough
+   candidates; do not enumerate whole pools.
 4. Before finalizing, check completeness, global uniqueness, cuisine, room and
    house rules, minimum nights, occupancy, transport compatibility, and budget.
    Flight+Taxi is allowed; Self-driving cannot be mixed with Flight or Taxi.

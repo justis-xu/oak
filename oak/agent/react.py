@@ -239,6 +239,17 @@ async def run_react(client: LLMClient, cfg: Config, q: Query,
         # Final Plan?
         m = FINAL_RE.search(out)
         if m:
+            # 空计划逃生门拦截：零/极少证据调用就交白卷 = 放弃（q37/q51/q74 实证：
+            # 模型第 1 步就"预判"没证据直接 Final Plan: []，连一次函数都不调）
+            if len(recorder.call_layer) < 3 and m.group(1).strip() in ("[]", "[ ]"):
+                obs = ("You output an empty plan after only "
+                       f"{len(recorder.call_layer)} evidence call(s). That is not allowed — "
+                       "you have not gathered any evidence yet. Call the catalog functions "
+                       "for transport, lodging, restaurants and attractions first; only an "
+                       "empty plan is acceptable AFTER real searches returned nothing.")
+                messages.append({"role": "user", "content": obs})
+                recorder.add_step(Step(n, thought=_thought_of(out), observation=obs))
+                continue
             step = Step(n, thought=_thought_of(out))
             recorder.add_step(step)
             result.raw_plan = m.group(1)

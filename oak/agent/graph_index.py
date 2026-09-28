@@ -92,11 +92,21 @@ def official_index(tp_root_str: str) -> dict:
     """
     tp = Path(tp_root_str)
 
+    # 官方加载语义：pd.read_csv().dropna() —— 任一列为空的行整行丢弃（how='any'）。
+    # 僵尸行（有名字但缺 house_rules/review 等）会被官方评测判 invalid，必须同样排除。
+    _NA = {"", "nan", "NaN", "NA", "None", "null"}
+
+    def alive(row: dict) -> bool:
+        return all(str(v).strip() not in _NA for v in row.values() if v is not None) \
+            and None not in row.values()
+
     def rows_of(path, name_col, city_col) -> dict[str, list[dict]]:
         m: dict[str, list[dict]] = {}
         if path.exists():
             with path.open(newline="", encoding="utf-8") as fh:
                 for row in csv.DictReader(fh):
+                    if not alive(row):
+                        continue
                     c = (row.get(city_col) or "").strip()
                     n = (row.get(name_col) or "").strip()
                     if c and n:
@@ -125,6 +135,8 @@ def official_index(tp_root_str: str) -> dict:
     if fp.exists():
         with fp.open(newline="", encoding="utf-8") as fh:
             for row in csv.DictReader(fh):
+                if not alive(row):           # 官方 Flights 同样 dropna()
+                    continue
                 n = (row.get("Flight Number") or "").strip()
                 if n:
                     fl.setdefault(n, set()).add(

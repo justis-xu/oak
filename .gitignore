@@ -18,3 +18,8 @@ runs/inference.round*.bak/
 runs/anchor/
 runs/anchor.*/
 runs/build/round_*/
+
+# 第五轮各版本快照（大体积，不入库；HF 有全量）
+runs/inference*.bak/
+runs/anchor.r*/
+.env.bak*

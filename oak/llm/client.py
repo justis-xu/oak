@@ -25,10 +25,14 @@ class BudgetExceeded(RuntimeError):
 
 # 思考型模型的 reasoning token 余量（正文预算之外追加的请求侧 max_tokens）
 REASONING_BUFFER = 3072
+# 无法关闭思考的外部推理模型（如 commandcode 网关的 deepseek-v4.1-flash）：
+# reasoning 与正文共享 completion 预算，必须给足余量，否则正文被思考吃空
+REASONING_BUFFER_EXTERNAL = 8192
 
 # 关闭深度思考的角色（机械执行类任务：抽取/ReAct/槽位/格式修复走 flash 且无需长思考）；
 # 核心推理步骤（schema 草拟、函数编译、评判器）保留思考
-THINKING_OFF_ROLES = {"kg", "react", "slots", "plan_repair"}
+THINKING_OFF_ROLES = {"kg", "react", "slots", "plan_repair",
+                      "locomo_extract", "locomo_util", "locomo_steps"}
 
 
 @dataclass
@@ -100,11 +104,16 @@ class LLMClient:
                 async with self._sem:
                     t0 = time.time()
                     # glm-5.3 系列为思考型模型：reasoning_content 消耗 completion 预算，
-                    # 请求侧加 reasoning 余量，保证正文拿满 max_tokens
+                    # 请求侧加 reasoning 余量，保证正文拿满 max_tokens；
+                    # 已关思考的角色不需要余量；无法关思考的外部模型给大余量
+                    if is_glm_endpoint:
+                        buffer = 0 if role in THINKING_OFF_ROLES else REASONING_BUFFER
+                    else:
+                        buffer = REASONING_BUFFER_EXTERNAL
                     kwargs: dict[str, Any] = dict(
                         model=model, messages=messages,
                         temperature=temperature,
-                        max_tokens=max_tokens + REASONING_BUFFER,
+                        max_tokens=max_tokens + buffer,
                         stream=True,                          # 流式：防 TUN 代理掐长连接
                         stream_options={"include_usage": True},
                         timeout=300.0,
@@ -117,17 +126,22 @@ class LLMClient:
                     # 流式聚合（本地 TUN 代理会挂起非流式长请求）
                     parts: list[str] = []
                     usage: dict = {}
+                    reasoning_chars = 0
                     async for chunk in await use_client.chat.completions.create(**kwargs):
                         if chunk.choices:
                             delta = chunk.choices[0].delta
                             if delta and delta.content:
                                 parts.append(delta.content)
+                            if delta and getattr(delta, "reasoning_content", None):
+                                reasoning_chars += len(delta.reasoning_content)
                         if getattr(chunk, "usage", None):
                             usage = {
                                 "prompt_tokens": chunk.usage.prompt_tokens or 0,
                                 "completion_tokens": chunk.usage.completion_tokens or 0,
                             }
                     content = "".join(parts)
+                    if reasoning_chars:
+                        usage["reasoning_chars"] = reasoning_chars
                 result = LLMResult(
                     content=content, usage=usage, cache_hit=False,
                     elapsed_s=round(time.time() - t0, 2), model=model, role=role,
