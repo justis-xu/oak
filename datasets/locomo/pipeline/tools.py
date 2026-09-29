@@ -195,16 +195,29 @@ class ToolBox:
         if kws:
             hit = [f for f in fids
                    if any(k in str(self.facts[f].get("陈述", "")) for k in kws)]
-            if hit:
-                scores = self.index.score(" ".join(kws))
-                hit.sort(key=lambda f: (-scores.get(f, 0.0), f))
-                fids = hit
-            else:
+            if not hit:
+                # 同义词扩展（纯词法）：直接命中为空时并入扩展词再试一次
+                from .prompts.lexicon import expand_all
+                kws_x, added = expand_all(kws)
+                if added:
+                    hit = [f for f in fids
+                           if any(k in str(self.facts[f].get("陈述", "")) for k in kws_x)]
+                if hit:
+                    scores = self.index.score(" ".join(kws_x))
+                    hit.sort(key=lambda f: (-scores.get(f, 0.0), f))
+                    fids = hit
+                    if added:
+                        note = f"（关键词无直接命中，同义词扩展命中 +{added}）\n"
+            if not hit and not note:
                 scores = self.index.score(" ".join(kws))
                 ranked = sorted(fids, key=lambda f: (-scores.get(f, 0.0), f))
                 keep = [f for f in ranked if scores.get(f, 0.0) > 0]
                 fids = keep or ranked[:限]
                 note = f"（关键词{kws}在主体事实中无直接命中；以下按词面相似度排序，注意甄别）\n"
+            elif hit and not note:
+                scores = self.index.score(" ".join(kws))
+                fids = hit
+                fids.sort(key=lambda f: (-scores.get(f, 0.0), f))
         start = (max(1, int(页)) - 1) * int(限)
         page = fids[start:start + int(限)]
         text, got = self._render(page, int(限), total=len(fids))
@@ -230,6 +243,12 @@ class ToolBox:
         if not str(关键词).strip():
             return "（关键词为空）", set()
         hits = self.index.search(str(关键词))
+        if not hits:
+            # 同义词扩展兜底
+            from .prompts.lexicon import expand_all
+            kws_x, added = expand_all([str(关键词)])
+            if added:
+                hits = self.index.search(" ".join(kws_x))
         fids = [fid for fid, _ in hits]
         if 主体:
             主体 = self._resolve_name(主体)

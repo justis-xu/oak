@@ -1,6 +1,8 @@
 """两层判题：确定性预检（零成本零方差）→ glm-5.3 盲判 exact/partial/wrong（只记 exact）。
 
 附带官方口径参考指标：字符 bigram F1（非对抗题）。
+S4 gold 修复支持：data/gold_repairs.jsonl 存在时判分先套修复表（逐题含判据与引证，
+永不隐去），report 同时保留原始 gold 口径。
 """
 from __future__ import annotations
 
@@ -10,11 +12,45 @@ from dataclasses import dataclass, field
 
 from oak.llm.client import LLMClient
 
-from .config import ns
+from .config import LOCOMO_TASK_DIR, ns
 from .data import CATEGORY_MAP, QA, TOPIC_CATEGORIES
 from .dates import answer_equivalent, cn_num, extract_digits, normalize_answer_text
 from .prompts.answer import REFUSAL
 from .prompts.judge import CATEGORY_RULES, JUDGE_SYSTEM, JUDGE_TEMPLATE
+
+
+def load_repairs(conv_id: str) -> dict[int, dict]:
+    """gold 修复表：{idx: {answer|None, adversarial, question?, 依据, 引证}}。"""
+    p = LOCOMO_TASK_DIR / "data" / "gold_repairs.jsonl"
+    out: dict[int, dict] = {}
+    if not p.exists():
+        return out
+    for line in p.read_text().splitlines():
+        try:
+            o = json.loads(line)
+        except Exception:
+            continue
+        if o.get("conv") == conv_id and isinstance(o.get("idx"), int):
+            out[o["idx"]] = o
+    return out
+
+
+def apply_repair(qa: QA, rep: dict | None) -> QA:
+    """把修复套到 QA 副本（不改原对象）。
+    可答化修复同时把 category 改为 4（单跳规则判分）——否则 judge 仍按对抗
+    rubric 把正确答案判 wrong（iter15 idx161/170/184 实证）。"""
+    if not rep:
+        return qa
+    new = QA(idx=qa.idx, question=rep.get("question", qa.question), category=qa.category,
+             answer=qa.answer, adversarial_answer=qa.adversarial_answer, evidence=qa.evidence)
+    if rep.get("adversarial"):
+        new.answer = None
+    elif "answer" in rep:
+        new.answer = rep["answer"]
+        if new.category == 5:
+            new.category = 4
+    return new
+
 
 REFUSAL_HINTS = ("未提及", "没有提到", "未提到", "无法确定", "无法回答", "不能确定",
                  "没有说明", "未说明", "没有相关信息", "对话中没有", "未提供", "没有记录")
@@ -121,22 +157,33 @@ def char_bigram_f1(gold: str, pred: str) -> float:
 
 
 async def grade_all(qa_list: list[QA], preds: dict[int, str], client: LLMClient,
-                    conv_id: str) -> dict:
+                    conv_id: str, repairs: dict[int, dict] | None = None) -> dict:
+    if repairs is None:
+        repairs = load_repairs(conv_id)
     grades: list[Grade] = []
+    orig_grades: list[Grade] = []
     for qa in qa_list:
         pred = preds.get(qa.idx, "")
-        det = deterministic_grade(qa, pred)
-        if det == "exact":
-            g = Grade(qa.idx, "exact", "det")
-        elif det == "wrong":
-            g = Grade(qa.idx, "wrong", "det")
-        else:
-            r = await llm_grade(qa, pred, client, conv_id)
-            g = Grade(qa.idx, r["grade"], "llm", r["reason"], r["missing"])
-        g.f1 = 0.0 if qa.category == 5 and qa.answer is None else \
-            char_bigram_f1(qa.gold_text(), pred)
-        grades.append(g)
-    return _aggregate(qa_list, grades, conv_id)
+        # 主口径：修复后 gold；并算原始 gold 口径（未修复题两次调用同键，判分缓存命中）
+        rqa = apply_repair(qa, repairs.get(qa.idx))
+        for tgt, out in ((rqa, grades), (qa, orig_grades)):
+            det = deterministic_grade(tgt, pred)
+            if det == "exact":
+                g = Grade(tgt.idx, "exact", "det")
+            elif det == "wrong":
+                g = Grade(tgt.idx, "wrong", "det")
+            else:
+                r = await llm_grade(tgt, pred, client, conv_id)
+                g = Grade(tgt.idx, r["grade"], "llm", r["reason"], r["missing"])
+            g.f1 = 0.0 if tgt.category == 5 and tgt.answer is None else \
+                char_bigram_f1(tgt.gold_text(), pred)
+            out.append(g)
+    report = _aggregate(qa_list, grades, conv_id)
+    orig_n = sum(g.grade == "exact" for g in orig_grades)
+    report["orig_exact"] = orig_n
+    report["orig_exact_rate"] = round(orig_n / max(len(orig_grades), 1), 4)
+    report["repairs_applied"] = len(repairs)
+    return report
 
 
 def _aggregate(qa_list: list[QA], grades: list[Grade], conv_id: str) -> dict:

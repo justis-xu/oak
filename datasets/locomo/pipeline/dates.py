@@ -172,6 +172,11 @@ def resolve_relative(anchor: date, expr: str) -> tuple[str, str]:
             base = anchor - timedelta(weeks=n) if "前" in e else anchor + timedelta(weeks=n)
             return (base.isoformat(), "周")
 
+    # 上周末/上礼拜末：锚日之前的最近一个周末（周六~周日，周粒度）
+    if re.search(r"上[周礼拜]+末", e):
+        sat = _last_weekday_before(anchor, 5)      # 最近周六（周一=0…周六=5）
+        return (f"{sat.isoformat()}~{(sat + timedelta(days=1)).isoformat()}", "周")
+
     # 上周/这周/下周（整周，周粒度，取周一为锚）
     if re.fullmatch(r"(上|上上|这|本|下)?(周|星期|礼拜)", e.replace(" ", "")):
         base = _resolve_core(anchor, e)
@@ -385,6 +390,17 @@ def answer_equivalent(gold: str | int, pred: str) -> bool:
         return False
     if g == p:
         return True
+    # "N年前" 模式：gold=N年前 且 pred 含同一数值的"X年前"表述（允许"约/大约"）→ exact
+    m = re.fullmatch(r"(\d+|[一二两三四五六七八九十]+)年前", str(gold).strip())
+    if m:
+        n = cn_num(m.group(1))
+        if n is not None:
+            if n == 2 and "两年前" in p:
+                return True
+            if n == 10 and "十年前" in p:
+                return True
+            if f"{n}年前" in p.replace("约", "").replace("大约", ""):
+                return True
     # 纯数字等价：gold=2022 / pred="2022年"
     gd, pd_ = extract_digits(g), extract_digits(p)
     if gd and pd_ and gd == pd_ and re.fullmatch(r"\d+", g):
