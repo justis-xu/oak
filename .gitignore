@@ -23,3 +23,9 @@ runs/build/round_*/
 runs/inference*.bak/
 runs/anchor.r*/
 .env.bak*
+
+# ---- 目录重组后（2026-09-29）：任务产物随任务目录 ----
+datasets/travelplanner/runs/
+datasets/locomo/runs/cache/
+datasets/locomo/runs/logs/
+datasets/locomo/runs/cost_ledger.jsonl

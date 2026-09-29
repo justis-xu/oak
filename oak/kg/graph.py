@@ -1,8 +1,11 @@
-"""图构建与合并：键签名（类型+主键）折叠 → 边端点重连 → 去重。"""
+"""图构建与合并：键签名（类型+主键）折叠 → 边端点重连 → 去重。
+
+EntityCandidate/RelationCandidate 是建图输入契约（框架层）；具体抽取在各任务模块。"""
 from __future__ import annotations
 
 import json
 import re
+from dataclasses import dataclass
 from pathlib import Path
 
 import networkx as nx
@@ -324,7 +327,6 @@ def programmatic_distance_entities(schema, tp_root) -> list:
     """
     import csv
     from pathlib import Path
-    from .extract import EntityCandidate
 
     target = None
     for e in schema.entities:
@@ -374,3 +376,18 @@ def graph_samples(g: nx.MultiDiGraph, per_type: int = 5) -> dict:
                 "props": {k: v for k, v in node_view(nd).items() if v not in (None, "")},
             })
     return out
+
+
+@dataclass
+class EntityCandidate:
+    etype: str
+    key: dict
+    properties: dict
+    chunk_id: str
+
+
+@dataclass
+class RelationCandidate:
+    relation: str
+    head: tuple[str, dict]
+    tail: tuple[str, dict]

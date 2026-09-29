@@ -1,0 +1,111 @@
+{
+  "conv": "conv-26",
+  "n": 6,
+  "exact": 5,
+  "exact_rate": 0.8333,
+  "j_exact_rate": 0.75,
+  "f1_avg": 0.1027,
+  "by_category": {
+    "时间": {
+      "n": 1,
+      "exact": 1,
+      "partial": 0,
+      "wrong": 0,
+      "exact_rate": 1.0
+    },
+    "开放域": {
+      "n": 1,
+      "exact": 0,
+      "partial": 1,
+      "wrong": 0,
+      "exact_rate": 0.0
+    },
+    "多跳": {
+      "n": 1,
+      "exact": 1,
+      "partial": 0,
+      "wrong": 0,
+      "exact_rate": 1.0
+    },
+    "单跳": {
+      "n": 1,
+      "exact": 1,
+      "partial": 0,
+      "wrong": 0,
+      "exact_rate": 1.0
+    },
+    "对抗": {
+      "n": 2,
+      "exact": 2,
+      "partial": 0,
+      "wrong": 0,
+      "exact_rate": 1.0
+    }
+  },
+  "grades": [
+    {
+      "idx": 0,
+      "grade": "exact",
+      "source": "llm",
+      "reason": "待判答案解析相对表述'昨天'后给出具体日期2023年5月7日，与标准答案完全一致。",
+      "missing": [],
+      "f1": 0.327
+    },
+    {
+      "idx": 2,
+      "grade": "partial",
+      "source": "llm",
+      "reason": "{\"grade\": \"partial\", \"missing\": [\"心理学（仅含糊表述为心理健康）\", \"心理咨询认证（缺认证要素，且以'心理咨询或心理健康'含糊并列）\"], \"reason\": \"心理咨询方向基本正确，但'心理学'被含糊替换为'心理健康'、缺失'认证'要素，且以'X或Y'含糊表述并列，不够精准。}",
+      "missing": [],
+      "f1": 0.104
+    },
+    {
+      "idx": 3,
+      "grade": "exact",
+      "source": "llm",
+      "reason": "待判答案明确指出卡罗琳在研究收养机构，与标准答案'领养机构'完全一致，额外细节（LGBTQ+收养、梦想）为正确补充不扣分。",
+      "missing": [],
+      "f1": 0.061
+    },
+    {
+      "idx": 82,
+      "grade": "exact",
+      "source": "llm",
+      "reason": "答案明确给出'心理健康'，与标准答案完全一致，附加说明正确不扣分。",
+      "missing": [],
+      "f1": 0.125
+    },
+    {
+      "idx": 152,
+      "grade": "exact",
+      "source": "det",
+      "reason": "",
+      "missing": [],
+      "f1": 0.0
+    },
+    {
+      "idx": 167,
+      "grade": "exact",
+      "source": "llm",
+      "reason": "{\"grade\": \"exact\", \"missing\": [], \"reason\": \"答案干净利落地表明该信息在对话中未提及，未附带任何具体猜测，完全符合对抗题型 exact 标准。}",
+      "missing": [],
+      "f1": 0.0
+    }
+  ],
+  "attribution": {
+    "推理或表述错": {
+      "n": 1,
+      "categories": {
+        "开放域": 1
+      }
+    }
+  },
+  "dispute_sample": [
+    152,
+    0,
+    167,
+    82,
+    2,
+    3
+  ]
+}

@@ -1,0 +1,32 @@
+{
+ "n": 50,
+ "delivered_old": 47,
+ "delivered_new": 47,
+ "blocking_old": 18,
+ "blocking_new": 18,
+ "improved": 0,
+ "worse": 0,
+ "regressed_pass": [],
+ "by_code_old": {
+  "budget.over": 5,
+  "plan.empty": 3,
+  "route.sequence": 1,
+  "route.state": 1,
+  "city.uncovered": 2,
+  "accom.city_mismatch": 1,
+  "route.loop": 1,
+  "transport.ground_not_in_graph": 1,
+  "meal.city_mismatch": 3
+ },
+ "by_code_new": {
+  "budget.over": 5,
+  "plan.empty": 3,
+  "route.sequence": 1,
+  "route.state": 1,
+  "city.uncovered": 2,
+  "accom.city_mismatch": 1,
+  "route.loop": 1,
+  "transport.ground_not_in_graph": 1,
+  "meal.city_mismatch": 3
+ }
+}

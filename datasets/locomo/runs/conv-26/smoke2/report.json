@@ -1,0 +1,56 @@
+{
+  "conv": "conv-26",
+  "n": 2,
+  "exact": 1,
+  "exact_rate": 0.5,
+  "j_exact_rate": 1.0,
+  "f1_avg": 0.2036,
+  "by_category": {
+    "时间": {
+      "n": 1,
+      "exact": 1,
+      "partial": 0,
+      "wrong": 0,
+      "exact_rate": 1.0
+    },
+    "对抗": {
+      "n": 1,
+      "exact": 0,
+      "partial": 1,
+      "wrong": 0,
+      "exact_rate": 0.0
+    }
+  },
+  "grades": [
+    {
+      "idx": 0,
+      "grade": "exact",
+      "source": "llm",
+      "reason": "待判答案明确给出2023年5月7日，与标准答案完全一致；附加的'昨天/基准日2023-05-08'推算信息自洽且正确，属多余正确细节不扣分。",
+      "missing": [],
+      "f1": 0.364
+    },
+    {
+      "idx": 167,
+      "grade": "partial",
+      "source": "llm",
+      "reason": "核心判断'不是'正确，但同时编造了对话中不存在的具体归属细节（梅拉妮制作、陶艺课、卡罗琳称赞），按对抗题型规则属'表明否定但附带具体猜测'，只能记partial。",
+      "missing": [
+        "附带的'梅拉妮在陶艺课上做的''她为此自豪''卡罗琳称赞'等具体细节均为对话中不存在的编造信息"
+      ],
+      "f1": 0.043
+    }
+  ],
+  "attribution": {
+    "检索miss": {
+      "n": 1,
+      "categories": {
+        "对抗": 1
+      }
+    }
+  },
+  "dispute_sample": [
+    0,
+    167
+  ]
+}

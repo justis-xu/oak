@@ -1,15 +1,16 @@
-"""全局配置：模型路由、并发、规模、限额、路径。"""
+"""OaK 框架核心配置：模型路由、并发、限额、缓存路径（任务无关）。
+
+各任务（datasets/travelplanner、datasets/locomo）在此 Config 之上叠自己的
+任务参数与产物目录——任务专属字段不在框架层。
+"""
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from dotenv import load_dotenv
-
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-# role -> tier；tier 再映射到具体模型
+# role -> tier；tier 再映射到具体模型（两任务共用；任务可只使用自己的角色前缀）
 MODEL_ROLES: dict[str, str] = {
     "schema": "strong",      # P1 需求分析 / P2 模式草拟
     "func_gen": "strong",    # P4 函数生成（含能力规划）
@@ -18,13 +19,15 @@ MODEL_ROLES: dict[str, str] = {
     "react": "fast",         # P5 ReAct 执行
     "slots": "fast",         # extract_runtime_slots 槽位提取
     "plan_repair": "fast",   # 计划格式修复 / salvage
-    # ---- locomo 子项目（中文 LoCoMo 本体问答）----
+    # ---- locomo 任务（中文 LoCoMo 本体问答）----
     "locomo_schema": "strong",   # P1/P2 本体起草
     "locomo_answer": "strong",   # 终答合成 + 证据自检
     "locomo_judge": "strong",    # 严格判分
     "locomo_extract": "fast",    # 原子事实抽取
     "locomo_util": "fast",       # 实体归并 / 完整性审计 / 格式修复
     "locomo_steps": "fast",      # ReAct 步骤
+    # ---- mem0 基线（只-ADD 记忆，中文）----
+    "mem0_extract": "fast",      # 加法事实提取
 }
 
 
@@ -43,33 +46,14 @@ class Config:
     max_concurrency: int = 4
     max_retries: int = 5
 
-    # 构建循环规模（对齐论文：每轮抽 train 的 20%，最多 5 轮）
-    rounds: int = 5
-    train_per_round: int = 9
-    test_size: int = 50
-    seed: int = 42
-
-    # 各环节限额（第五轮：城市池变宽后 20 步不够逐城收集 → 26）
-    react_max_steps: int = 30
-    schema_attempts: int = 4
-    func_gen_attempts: int = 3
-    plan_repair_attempts: int = 2
-
-    # 路径
+    # 框架级路径（任务通常覆盖 work_dir 以隔离产物）
     work_dir: Path = PROJECT_ROOT / "runs"
-    tp_root: Path = PROJECT_ROOT / "third_party" / "TravelPlanner"
 
-    # 附加语料：城际地面交通（官方环境数据，非评测答案）
-    include_distance_matrix_corpus: bool = True
-
-    # 成本硬顶（按 namespace 计）
+    # 成本硬顶（按 namespace 计；locomo 用 lc* 前缀天然绕开）
     limits: dict = field(default_factory=lambda: {
         "build_round_calls": 600,      # 单轮 LLM 调用上限
         "inference_calls_per_q": 60,   # 单测试题上限
     })
-
-    # 冻结策略：final=第 5 轮产物；best_round=按 patched Final 选优
-    freeze_policy: str = "final"
 
     def model_for(self, role: str) -> str:
         tier = MODEL_ROLES.get(role)
@@ -77,7 +61,7 @@ class Config:
             raise ValueError(f"unknown LLM role: {role}")
         return self.model_strong if tier == "strong" else self.model_fast
 
-    # ---- 派生路径 ----
+    # ---- 框架派生路径 ----
     @property
     def cache_dir(self) -> Path:
         return self.work_dir / "cache" / "llm"
@@ -85,46 +69,3 @@ class Config:
     @property
     def ledger_path(self) -> Path:
         return self.work_dir / "cost_ledger.jsonl"
-
-    @property
-    def data_dir(self) -> Path:
-        return self.work_dir / "data"
-
-    @property
-    def build_dir(self) -> Path:
-        return self.work_dir / "build"
-
-    @property
-    def final_dir(self) -> Path:
-        return self.work_dir / "final"
-
-    @property
-    def inference_dir(self) -> Path:
-        return self.work_dir / "inference"
-
-
-def load_config() -> Config:
-    load_dotenv(PROJECT_ROOT / ".env")
-    cfg = Config()
-    cfg.api_key = os.environ.get("ZHIPU_API_KEY", "")
-    if not cfg.api_key:
-        raise RuntimeError("ZHIPU_API_KEY 未设置（.env 或环境变量）")
-    # fast 档可选切换到第三方网关（省额度）——切外部网关时必须提供该网关自己的 key
-    cfg.fast_base_url = os.environ.get("FAST_API_BASE", "") or cfg.api_base_url
-    cfg.model_fast = os.environ.get("FAST_MODEL", "") or cfg.model_fast
-    if cfg.fast_base_url != cfg.api_base_url:
-        cfg.fast_api_key = os.environ.get("FAST_API_KEY", "")
-        if not cfg.fast_api_key:
-            raise RuntimeError(
-                "FAST_API_BASE 指向外部网关时必须在 .env 设置该网关的 FAST_API_KEY"
-                "（出于安全不回落使用智谱 key）")
-    else:
-        cfg.fast_api_key = cfg.api_key
-    # JDK（HermiT 依赖）：.env 提供 JAVA_HOME 时注入 PATH，所有子进程继承
-    jh = os.environ.get("JAVA_HOME", "")
-    if jh and Path(jh).exists():
-        os.environ["PATH"] = f"{jh}/bin:" + os.environ.get("PATH", "")
-    for d in (cfg.work_dir, cfg.cache_dir, cfg.data_dir, cfg.build_dir,
-              cfg.final_dir, cfg.inference_dir):
-        d.mkdir(parents=True, exist_ok=True)
-    return cfg

@@ -1,0 +1,31 @@
+{
+  "yaml": "meta:\n  domain: 长对话个人记忆问答（LoCoMo 中文）\n  version: skeleton-v1\nentity_types:\n  人物:\n    description: 对话双方及一切被提及的人（亲属、朋友、同事等第三方；第三方无名字时用\"XX的Y\"形式）\n    primary_key:\n    - 姓名\n    attributes:\n    - name: 姓名\n      dtype: string\n    - name: 别名\n      dtype: string\n    - name: 身份\n      dtype: string\n  地点:\n    description: ''\n    primary_key:\n    - 名称\n    attributes:\n    - name: 名称\n      dtype: string\n    - name: 类别\n      dtype: string\n  组织:\n    description: ''\n    primary_key:\n    - 名称\n    attributes:\n    - name: 名称\n      dtype: string\n    - name: 类别\n      dtype: string\n  物品:\n    description: 含宠物、礼物、收藏、书籍、首饰等\n    primary_key:\n    - 名称\n    attributes:\n    - name: 名称\n      dtype: string\n    - name: 类别\n      dtype: string\n  活动:\n    description: 爱好、运动、课程、志愿、比赛等\n    primary_key:\n    - 名称\n    attributes:\n    - name: 名称\n      dtype: string\n    - name: 类别\n      dtype: string\n  主题:\n    description: 受控话题词表（P1 按题面起草；抽取端从中选，代码接受词表外的词并建节点）\n    primary_key:\n    - 名称\n    attributes:\n    - name: 名称\n      dtype: string\n  会话:\n    description: 时间线锚点（每 session 程序化建一个）\n    primary_key:\n    - 序号\n    attributes:\n    - name: 序号\n      dtype: int\n    - name: 日期\n      dtype: string\n    - name: 星期\n      dtype: string\n  原子事实:\n    description: 一事一条的最小知识单元，全图内容主体；主体归因是对抗题的防御根基\n    primary_key:\n    - 编号\n    attributes:\n    - name: 编号\n      dtype: string\n    - name: 陈述\n      dtype: string\n    - name: 主体\n      dtype: string\n    - name: 类型\n      dtype: string\n    - name: 日期\n      dtype: string\n    - name: 日期粒度\n      dtype: string\n    - name: 日期原文\n      dtype: string\n    - name: 数值\n      dtype: string\n    - name: 主题\n      dtype: string\n    - name: 出处\n      dtype: string\nrelation_types:\n  归属于:\n    domain: 原子事实\n    range: 人物\n    description: 事实的主体（谁的）——对抗题主防线；系统建（源自抽取的 s 字段）\n  涉及人物:\n    domain: 原子事实\n    range: 人物\n    description: 系统建（源自抽取的 ev 字段）\n  涉及地点:\n    domain: 原子事实\n    range: 地点\n    description: 系统建\n  涉及组织:\n    domain: 原子事实\n    range: 组织\n    description: 系统建\n  涉及物品:\n    domain: 原子事实\n    range: 物品\n    description: 系统建\n  涉及活动:\n    domain: 原子事实\n    range: 活动\n    description: 系统建\n  属于主题:\n    domain: 原子事实\n    range: 主题\n    description: 系统建（源自抽取的 tp 字段）\n  记录于:\n    domain: 原子事实\n    range: 会话\n    description: 系统按出处 dia_id 派生\n  亲属:\n    domain: 人物\n    range: 人物\n    description: 明细（祖母/姐姐…）由关联的原子事实承载\n  朋友:\n    domain: 人物\n    range: 人物\n  同事:\n    domain: 人物\n    range: 人物\n  伴侣:\n    domain: 人物\n    range: 人物\n  居住于:\n    domain: 人物\n    range: 地点\n  就职于:\n    domain: 人物\n    range: 组织\n  就读于:\n    domain: 人物\n    range: 组织\n  喜爱:\n    domain: 人物\n    range: 活动\n    description: 系统从\"类型=偏好\"且态度为正的原子事实派生\naxioms:\n- kind: disjoint\n  classes:\n  - 人物\n  - 地点\n  - 组织\n  - 物品\n  - 活动\n  - 主题\n  - 会话\n  - 原子事实\n- kind: domain\n  relation: 归属于\n  class: 原子事实\n- kind: range\n  relation: 归属于\n  class: 人物\n",
+  "topics": [
+    "家庭",
+    "子女教育",
+    "收养",
+    "心理健康",
+    "性别身份",
+    "职业发展",
+    "教育学习",
+    "阅读书籍",
+    "运动健身",
+    "旅行",
+    "饮食",
+    "宠物动物",
+    "音乐艺术",
+    "医疗健康",
+    "人际关系",
+    "爱好手工",
+    "志愿公益",
+    "购物物品",
+    "居住搬家",
+    "财务",
+    "节日庆典",
+    "交通驾驶",
+    "技术设备",
+    "宗教信仰",
+    "服装外貌"
+  ],
+  "p1": ""
+}
