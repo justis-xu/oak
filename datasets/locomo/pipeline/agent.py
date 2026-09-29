@@ -222,6 +222,38 @@ async def run_qa(idx: int, question: str, conv_header: str, toolbox: ToolBox,
     if not answer.startswith(REFUSAL) and any(answer.startswith(h) for h in REFUSAL_HINTS):
         answer, evidence = REFUSAL, []
 
+    # 作答闸门（防主体改写，idx152/166 实证）：问"某人"的非列举题，若全部证据
+    # 事实的主体都与问句主体不符 → 复核一次；仍无主体一致的证据 → 拒答
+    if not answer.startswith(REFUSAL) and evidence:
+        persons_in_q = [p for p, e in toolbox.entities.items()
+                        if e.get("etype") == "人物" and p and p in question]
+        asked = persons_in_q[0] if persons_in_q else ""
+        from .funcs_compile import question_kind
+        # 双人问句（"甲怎么看乙…"）与是非题跳过闸门——主体归因歧义大，误伤实证（iter19）
+        if asked and len(persons_in_q) == 1 and question_kind(question) != "列举" \
+                and "吗" not in question:
+            subj_ok = any(asked in str(toolbox.facts.get(f, {}).get("主体", ""))
+                          for f in evidence)
+            if not subj_ok:
+                recheck = await client.chat(
+                    role="locomo_util", namespace=qns,
+                    temperature=0.0, max_tokens=256, json_mode=True,
+                    messages=[{"role": "system", "content": "你是主体一致性核查器，只输出 JSON。"},
+                              {"role": "user", "content":
+                                  f"问题：{question}\n引用事实主体："
+                                  + "、".join(sorted({str(toolbox.facts.get(f, {}).get('主体', '')) for f in evidence})) +
+                                  f'\n问题问的是"{asked}"的事。上述事实的主体是否包含"{asked}"'
+                                  '（含"X的家人"类扩展）？输出 {"ok": true|false}'}])
+                m2 = re.search(r"\{.*\}", recheck.content, re.S)
+                ok = False
+                if m2:
+                    try:
+                        ok = bool(json.loads(m2.group(0)).get("ok"))
+                    except Exception:
+                        pass
+                if not ok:
+                    answer, evidence = REFUSAL, []
+
     out.answer = answer
     out.evidence = evidence
     out.refused = answer.startswith(REFUSAL)

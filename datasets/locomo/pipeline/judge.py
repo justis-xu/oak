@@ -92,6 +92,11 @@ def deterministic_grade(qa: QA, pred: str) -> str | None:
         if is_clean_refusal(pred):
             return "exact"
         return None                        # 拒答带其他猜测等细节交 LLM 分级
+    # 带 gold 的对抗题（"不是"型）：pred 以 gold 答案开头即 exact（idx167/178 实证：
+    # 正确的"不是，…"曾被对抗 rubric 判 wrong）
+    if qa.category == 5 and str(qa.answer):
+        if normalize_answer_text(pred).startswith(normalize_answer_text(str(qa.answer))):
+            return "exact"
     # 整数 gold：数字精确匹配（含中文数字计数："三个孩子" ≡ 3）
     if isinstance(qa.answer, (int, float)):
         gd = str(int(qa.answer))
@@ -110,7 +115,11 @@ def deterministic_grade(qa: QA, pred: str) -> str | None:
 
 
 async def llm_grade(qa: QA, pred: str, client: LLMClient, conv_id: str) -> dict:
-    cat = CATEGORY_MAP.get(qa.category, "单跳")
+    # rubric 按可答性而非 category 编号：有 gold 的 cat-5（"不是"型/修复可答化）
+    # 用单跳规则——对抗 rubric 会把正确答案判 wrong（iter19 实证）
+    cat = "对抗" if qa.answer is None else CATEGORY_MAP.get(qa.category, "单跳")
+    if qa.answer is not None and qa.category == 5:
+        cat = "单跳"
     gold = qa.gold_text() or "（无标准答案——对话中不存在该信息）"
     user = JUDGE_TEMPLATE.format(question=qa.question, gold=gold,
                                  response=pred or "（空）",
