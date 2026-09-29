@@ -117,7 +117,7 @@ def render_skeleton(kind: str, rows: list[dict], question: str) -> str:
     if not rows:
         return ""
     lines = [f"——以下为领域函数「{kind}」的确定性聚合结果（已去重，供你选择作答要素）——"]
-    for r in rows[:40]:
+    for r in rows[:60]:
         d = r.get("日期") or ""
         o = r.get("日期原文") or ""
         dt = f"{d}" + (f"（原文:{o}）" if o else "")
