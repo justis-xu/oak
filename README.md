@@ -48,9 +48,9 @@ oak/
 | LoCoMo 中文 conv-26 | 官方宽松口径 | 复评见任务目录 | Mem0-Graph ≈0.40 F1 |
 | LoCoMo 中文 conv-44 | 严格 exact（零调参首跑） | **68.3%** | — |
 
-> LoCoMo 中文轨道的天花板审计（gold 可达性逐题验证）显示：约 9% 的题
-> 标准答案在中文译文（乃至英文原版语料）中不存在——量化证据见
-> `datasets/locomo/pipeline/OPTIMIZATION_LOG.md` 与 `PLAN-90.md`。
+> 说明：locomo 成绩为**锚点对话 conv-26**（199 题，gold 修复后口径）；全量 10 段未跑，
+> 不得外推。天花板审计（gold 可达性逐题验证）显示约 9% 的题标准答案在译文中不存在，
+> 量化证据见 `datasets/locomo/pipeline/OPTIMIZATION_LOG.md` 与 `PLAN-90.md`。
 
 ## 快速开始
 
