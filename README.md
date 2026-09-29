@@ -1,3 +1,13 @@
+---
+license: mit
+language: zh
+tags:
+- long-conversation-memory
+- ontology
+- locomo
+- benchmark-reproduction
+---
+
 # oak：动态本体（OaK）复现仓库
 
 > OaK（arXiv:2608.22974，*Toward Effective and Reliable LLM Agents via Dynamic Ontology*）
